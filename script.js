@@ -1,4 +1,6 @@
-// --- دوال مساعدة ---
+// بيانات الخطوات لتصديرها لاحقاً
+let currentSteps = [];
+
 function f(expr, x) {
     try { return math.evaluate(expr, { x: x }); } 
     catch (e) { return NaN; }
@@ -9,36 +11,41 @@ function df(expr, x) {
     return (f(expr, x + h) - f(expr, x)) / h;
 }
 
-function loadExample() {
-    const val = document.getElementById('examples').value;
-    if(val) document.getElementById('equation').value = val;
-}
-
-function toggleInputs() {
+// تحديث النص التعليمي عند تغيير الطريقة
+function updateMethodInfo() {
     const method = document.getElementById('methodSelect').value;
-    document.getElementById('bisectionInputs').style.display = (method === 'bisection') ? 'block' : 'none';
-    document.getElementById('newtonInputs').style.display = (method === 'newton') ? 'block' : 'none';
+    const infoBox = document.getElementById('methodInfo');
+    const bisectionDiv = document.getElementById('bisectionInputs');
+    const newtonDiv = document.getElementById('newtonInputs');
+
+    if (method === 'bisection') {
+        infoBox.innerHTML = "<strong>طريقة التنصيف (Dichotomie):</strong> تعتمد على مبرهنة القيم المتوسطة. تقسم المجال [a,b] باستمرار وتحصر الجذر في مجالات أصغر.";
+        bisectionDiv.style.display = 'block';
+        newtonDiv.style.display = 'none';
+    } else {
+        infoBox.innerHTML = "<strong>طريقة نيوتن (Newton):</strong> تعتمد على المماس عند النقطة. سريعة جداً ولكن تتطلب نقطة انطلاق قريبة واشتقاق الدالة.";
+        bisectionDiv.style.display = 'none';
+        newtonDiv.style.display = 'block';
+    }
 }
 
-// --- المحرك الرئيسي ---
 function solveEquation() {
     const expr = document.getElementById('equation').value;
     const method = document.getElementById('methodSelect').value;
     const tol = parseFloat(document.getElementById('tolerance').value);
     const maxIter = parseInt(document.getElementById('maxIter').value);
     
-    // تنظيف الواجهة
+    // إعادة تعيين الواجهة
     const resultDiv = document.getElementById('finalResult');
     const tableDiv = document.getElementById('tableContainer');
     const tbody = document.querySelector('#stepsTable tbody');
     const thead = document.querySelector('#stepsTable thead');
     
     tbody.innerHTML = '';
-    thead.innerHTML = '';
     resultDiv.classList.add('hidden');
     tableDiv.classList.add('hidden');
-
-    let steps = [];
+    
+    currentSteps = []; // تصفير البيانات
     let root = null;
     let converged = false;
 
@@ -48,15 +55,12 @@ function solveEquation() {
             let b = parseFloat(document.getElementById('b').value);
 
             if (f(expr, a) * f(expr, b) >= 0) {
-                alert("خطأ: الدالة يجب أن تختلف إشارتها بين طرفي المجال f(a)*f(b) < 0");
+                alert("شرط التنصيف غير محقق: f(a) * f(b) يجب أن يكون أصغر من 0.");
                 return;
             }
 
-            // إعداد رأس الجدول
-            thead.innerHTML = `<tr><th>#</th><th>a</th><th>b</th><th>c (المنتصف)</th><th>f(c)</th><th>الخطأ (b-a)</th></tr>`;
-
+            thead.innerHTML = `<tr><th>n</th><th>a</th><th>b</th><th>c (المنتصف)</th><th>f(c)</th><th>الخطأ</th></tr>`;
             let iter = 0;
-            let c_old = a;
             
             do {
                 iter++;
@@ -64,148 +68,114 @@ function solveEquation() {
                 let fc = f(expr, c);
                 let error = Math.abs(b - a);
 
-                steps.push({ iter, a, b, c, fc, error });
+                currentSteps.push({ n: iter, val1: a, val2: b, res: c, f_res: fc, err: error });
 
-                if (fc === 0 || error < tol) {
-                    root = c;
-                    converged = true;
-                    break;
-                }
+                let row = `<tr><td>${iter}</td><td>${a.toFixed(5)}</td><td>${b.toFixed(5)}</td>
+                           <td style="font-weight:bold; color:#2563eb">${c.toFixed(6)}</td>
+                           <td>${fc.toExponential(2)}</td><td>${error.toExponential(2)}</td></tr>`;
+                tbody.innerHTML += row;
 
-                if (f(expr, a) * fc < 0) b = c;
-                else a = c;
-                
-                c_old = c;
+                if (fc === 0 || error < tol) { root = c; converged = true; break; }
+
+                if (f(expr, a) * fc < 0) b = c; else a = c;
 
             } while (iter < maxIter);
 
         } else {
             // Newton
             let x = parseFloat(document.getElementById('x0').value);
-            
-            // إعداد رأس الجدول
-            thead.innerHTML = `<tr><th>#</th><th>x_old</th><th>f(x)</th><th>f'(x)</th><th>x_new</th><th>الخطأ</th></tr>`;
-
+            thead.innerHTML = `<tr><th>n</th><th>x_old</th><th>f(x)</th><th>f'(x)</th><th>x_new</th><th>الخطأ</th></tr>`;
             let iter = 0;
+
             do {
                 iter++;
                 let fx = f(expr, x);
                 let dfx = df(expr, x);
-                
-                if (Math.abs(dfx) < 1e-10) {
-                    alert("المشتقة قريبة جداً من الصفر، الطريقة فشلت.");
-                    return;
-                }
+                if (Math.abs(dfx) < 1e-10) { alert("المشتقة تساوي صفر!"); return; }
 
                 let x_new = x - (fx / dfx);
                 let error = Math.abs(x_new - x);
 
-                steps.push({ iter, x, fx, dfx, x_new, error });
+                currentSteps.push({ n: iter, val1: x, val2: fx, res: x_new, f_res: dfx, err: error });
+
+                let row = `<tr><td>${iter}</td><td>${x.toFixed(6)}</td><td>${fx.toExponential(2)}</td>
+                           <td>${dfx.toFixed(4)}</td><td style="font-weight:bold; color:#2563eb">${x_new.toFixed(6)}</td>
+                           <td>${error.toExponential(2)}</td></tr>`;
+                tbody.innerHTML += row;
 
                 x = x_new;
-                
-                if (error < tol) {
-                    root = x;
-                    converged = true;
-                    break;
-                }
+                if (error < tol) { root = x; converged = true; break; }
+
             } while (iter < maxIter);
         }
 
-        // 1. عرض النتيجة النهائية
         if (converged) {
-            resultDiv.innerHTML = `تم الوصول للحل: x ≈ ${root.toFixed(7)}`;
+            resultDiv.innerHTML = `تم الوصول للجذر: x ≈ ${root.toFixed(7)}`;
             resultDiv.classList.remove('hidden');
         } else {
-            resultDiv.innerHTML = `لم يتم الوصول للدقة المطلوبة بعد ${maxIter} تكرار.`;
-            resultDiv.classList.remove('hidden');
-            resultDiv.style.background = "#fee2e2"; // لون أحمر للتحذير
-            resultDiv.style.color = "#991b1b";
-            resultDiv.style.borderColor = "#f87171";
+            resultDiv.innerHTML = `توقف: تم الوصول للحد الأقصى للتكرارات (${maxIter})`;
         }
-
-        // 2. ملء الجدول
+        
         tableDiv.classList.remove('hidden');
-        steps.forEach(s => {
-            let row = document.createElement('tr');
-            if (method === 'bisection') {
-                row.innerHTML = `<td>${s.iter}</td><td>${s.a.toFixed(5)}</td><td>${s.b.toFixed(5)}</td>
-                                 <td style="font-weight:bold">${s.c.toFixed(6)}</td><td>${s.fc.toExponential(2)}</td><td>${s.error.toExponential(2)}</td>`;
-            } else {
-                row.innerHTML = `<td>${s.iter}</td><td>${s.x.toFixed(6)}</td><td>${s.fx.toExponential(2)}</td>
-                                 <td>${s.dfx.toFixed(4)}</td><td style="font-weight:bold">${s.x_new.toFixed(6)}</td><td>${s.error.toExponential(2)}</td>`;
-            }
-            tbody.appendChild(row);
-        });
-
-        // 3. رسم الدالة
         drawChart(expr, root, method);
 
     } catch (err) {
-        console.error(err);
-        alert("تأكد من كتابة الدالة بشكل صحيح.");
+        alert("تأكد من صحة الدالة المدخلة");
     }
 }
 
-// --- دالة الرسم البياني ---
-function drawChart(expr, root, method) {
-    // تحديد نطاق الرسم حول الجذر
-    let center = root || 0;
-    let range = 5; // نرسم 5 وحدات يمين ويسار
+// دالة تصدير النتائج لملف Excel/CSV
+function exportToCSV() {
+    if (currentSteps.length === 0) return;
     
-    // إذا كانت طريقة التنصيف نستخدم حدود المجال للرسم
-    if (method === 'bisection') {
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM للعربية
+    const method = document.getElementById('methodSelect').value;
+    
+    if(method === 'bisection') csvContent += "Iteration,a,b,c,f(c),Error\n";
+    else csvContent += "Iteration,x_old,f(x),f'(x),x_new,Error\n";
+
+    currentSteps.forEach(row => {
+        csvContent += `${row.n},${row.val1},${row.val2},${row.res},${row.f_res},${row.err}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "numerical_results.csv");
+    document.body.appendChild(link);
+    link.click();
+}
+
+function drawChart(expr, root, method) {
+    let center = root || 0;
+    let range = 3; 
+    if(method === 'bisection') {
         let a = parseFloat(document.getElementById('a').value);
         let b = parseFloat(document.getElementById('b').value);
-        range = Math.abs(b - a) * 1.5; // تكبير النطاق قليلاً
-        center = (a + b) / 2;
+        center = (a+b)/2;
+        range = Math.abs(b-a) + 1;
     }
 
-    let xValues = [];
-    let yValues = [];
-    let start = center - range;
-    let end = center + range;
-    let step = (end - start) / 100;
-
-    for (let x = start; x <= end; x += step) {
-        xValues.push(x);
-        yValues.push(f(expr, x));
+    let xVals = [], yVals = [];
+    for (let x = center - range; x <= center + range; x += range/50) {
+        xVals.push(x); yVals.push(f(expr, x));
     }
 
-    // خط الدالة
-    let trace1 = {
-        x: xValues,
-        y: yValues,
-        mode: 'lines',
-        name: 'f(x)',
-        line: {color: '#2563eb'}
-    };
-
-    // نقطة الجذر (إذا وجد)
+    let trace1 = { x: xVals, y: yVals, type: 'scatter', name: 'f(x)' };
     let data = [trace1];
+
     if (root !== null) {
-        let trace2 = {
-            x: [root],
-            y: [0],
-            mode: 'markers',
-            name: 'الجذر (Root)',
-            marker: {color: 'red', size: 12}
-        };
-        data.push(trace2);
+        data.push({ x: [root], y: [0], mode: 'markers', marker: {color: 'red', size: 10}, name: 'الجذر' });
     }
 
-    // خط الصفر (المحور)
-    let layout = {
-        title: 'التمثيل البياني للدالة',
-        xaxis: {title: 'x'},
-        yaxis: {title: 'f(x)'},
-        shapes: [{
-            type: 'line',
-            x0: start, y0: 0,
-            x1: end, y1: 0,
-            line: {color: 'black', width: 1, dash: 'dash'}
-        }]
+    let layout = { 
+        title: 'الرسم البياني للدالة', 
+        xaxis: {title: 'x'}, yaxis: {title: 'f(x)'},
+        margin: {t: 30, l: 40, r: 20, b: 40}
     };
-
+    
     Plotly.newPlot('plotArea', data, layout, {responsive: true});
 }
+
+// تهيئة أولية
+updateMethodInfo();
