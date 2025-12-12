@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NumAnalysis Lab | المختبر الرقمي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>تطبيق التحليل العددي | Numerical Analysis App</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    
     <script>
         window.MathJax = { tex: { inlineMath: [['$', '$']] }, svg: { fontCache: 'global' } };
     </script>
@@ -17,89 +19,114 @@
 </head>
 <body>
 
-    <nav class="glass-nav">
-        <div class="brand">
-            <i class="fa-solid fa-flask"></i> NumAnalysis <span>Lab</span>
-        </div>
-        <button onclick="window.print()" class="print-btn"><i class="fa-solid fa-print"></i> طباعة التقرير</button>
-    </nav>
-
-    <div class="container">
-        <div class="sidebar no-print">
-            <div class="glass-panel">
-                <h3><i class="fa-solid fa-pen-to-square"></i> المعطيات</h3>
-                
-                <div class="form-group">
-                    <label>الدالة $f(x)$</label>
-                    <input type="text" id="equation" value="x^3 - x - 1" oninput="renderMath()">
-                    <div id="mathPreview" class="latex-view">$$x^3 - x - 1$$</div>
-                </div>
-
-                <div class="form-group">
-                    <label>المجال $[a, b]$ (للتنصيف)</label>
-                    <div class="row">
-                        <input type="number" id="a" value="1">
-                        <input type="number" id="b" value="2">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>نقطة $x_0$ (لنيوتن)</label>
-                    <input type="number" id="x0" value="1.5">
-                </div>
-
-                <div class="form-group">
-                    <label>الدقة $\epsilon$</label>
-                    <input type="number" id="tolerance" value="0.00001" step="0.00001">
-                </div>
-
-                <div class="btn-group">
-                    <button onclick="solveAll()" class="btn-run">
-                        <i class="fa-solid fa-play"></i> تحليل ومقارنة
-                    </button>
-                </div>
+    <header class="app-header">
+        <div class="logo">
+            <i class="fa-solid fa-calculator"></i>
+            <div>
+                <h1>التحليل العددي</h1>
+                <span>الوحدة 1: حل المعادلات غير الخطية</span>
             </div>
         </div>
+        <button class="btn-print" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> طباعة التقرير
+        </button>
+    </header>
 
-        <div class="content">
-            <div class="glass-panel result-summary" id="summaryPanel">
-                <h2><i class="fa-solid fa-flag-checkered"></i> ملخص النتائج</h2>
-                <div class="cards-wrapper">
-                    <div class="stat-card bisection">
-                        <h4>طريقة التنصيف</h4>
-                        <div class="val" id="res_bi_root">-</div>
-                        <div class="sub">تكرارات: <span id="res_bi_iter">-</span></div>
+    <main class="container">
+        
+        <section class="panel control-panel no-print">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-sliders"></i> إعدادات الحل</h2>
+            </div>
+            
+            <div class="input-group">
+                <label>الدالة $f(x)$</label>
+                <input type="text" id="equation" value="x^3 - x - 1" placeholder="مثال: cos(x) - x">
+                <div id="mathPreview" class="latex-output">$$x^3 - x - 1$$</div>
+            </div>
+
+            <div class="input-group">
+                <label>اختر الطريقة</label>
+                <div class="tabs-container">
+                    <button class="tab-btn active" onclick="setMethod('bisection')">تنصيف (Dichotomie)</button>
+                    <button class="tab-btn" onclick="setMethod('newton')">نيوتن (Newton)</button>
+                </div>
+                <input type="hidden" id="selectedMethod" value="bisection">
+            </div>
+
+            <div id="inputs-bisection" class="method-inputs">
+                <div class="row">
+                    <div class="col">
+                        <label>المجال [a]</label>
+                        <input type="number" id="val_a" value="1">
                     </div>
-                    <div class="stat-card newton">
-                        <h4>طريقة نيوتن</h4>
-                        <div class="val" id="res_new_root">-</div>
-                        <div class="sub">تكرارات: <span id="res_new_iter">-</span></div>
+                    <div class="col">
+                        <label>المجال [b]</label>
+                        <input type="number" id="val_b" value="2">
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel chart-section">
-                <h3><i class="fa-solid fa-chart-line"></i> سلوك التقارب (Convergence)</h3>
-                <p class="hint">هذا الرسم يوضح سرعة تناقص الخطأ في كل طريقة.</p>
-                <div id="convergencePlot"></div>
+            <div id="inputs-newton" class="method-inputs hidden">
+                <label>نقطة البداية $x_0$</label>
+                <input type="number" id="val_x0" value="1.5">
             </div>
 
-            <div class="glass-panel table-section">
-                <h3><i class="fa-solid fa-list"></i> التفاصيل الكاملة</h3>
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="showTab('bi')">جدول التنصيف</button>
-                    <button class="tab-btn" onclick="showTab('new')">جدول نيوتن</button>
+            <div class="row">
+                <div class="col">
+                    <label>الدقة ($\epsilon$)</label>
+                    <input type="number" id="tolerance" value="0.0001" step="0.00001">
                 </div>
-                
-                <div id="tab-bi" class="tab-content active">
-                    <table id="tableBi"><thead></thead><tbody></tbody></table>
-                </div>
-                <div id="tab-new" class="tab-content">
-                    <table id="tableNew"><thead></thead><tbody></tbody></table>
+                <div class="col">
+                    <label>Max Iter</label>
+                    <input type="number" id="maxIter" value="50">
                 </div>
             </div>
-        </div>
-    </div>
+
+            <button class="btn-primary" onclick="app.run()">
+                ابدأ الحساب <i class="fa-solid fa-play"></i>
+            </button>
+            
+            <div id="errorMessage" class="error-box hidden"></div>
+        </section>
+
+        <section class="panel results-panel">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-chart-pie"></i> النتائج والتحليل</h2>
+                <div id="statusBadge" class="status-badge hidden">تم الحل</div>
+            </div>
+
+            <div class="result-summary hidden" id="summaryBox">
+                <div class="summary-item">
+                    <span>الجذر التقريبي ($x$)</span>
+                    <strong id="res_root" class="highlight">-</strong>
+                </div>
+                <div class="summary-item">
+                    <span>عدد التكرارات ($n$)</span>
+                    <strong id="res_iter">-</strong>
+                </div>
+                <div class="summary-item">
+                    <span>قيمة الدالة $f(x)$</span>
+                    <strong id="res_func">-</strong>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div id="plotDiv"></div>
+            </div>
+
+            <div class="table-container hidden" id="tableBox">
+                <h3>جدول التكرارات التفصيلي</h3>
+                <div class="table-scroll">
+                    <table id="dataTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
 
     <script src="script.js"></script>
 </body>
