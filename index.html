@@ -3,93 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق التحليل العددي - Numerical Analysis</title>
+    <title>NumAnalysis Pro | التحليل العددي</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="style.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-brand">التحليل العددي</div>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <nav class="glass-nav">
+        <div class="logo">
+            <i class="fa-solid fa-infinity"></i> NumAnalysis <span>Pro</span>
+        </div>
         <ul class="nav-links">
-            <li><a href="#" class="active" onclick="switchModule(1)">1. حل معادلات غير خطية</a></li>
-            <li><a href="#" class="disabled" title="قيد التطوير">2. أنظمة خطية</a></li>
-            <li><a href="#" class="disabled" title="قيد التطوير">3. التكامل العددي</a></li>
-            <li><a href="#" class="disabled" title="قيد التطوير">4. الاشتقاق</a></li>
+            <li class="active"><i class="fa-solid fa-square-root-variable"></i> حل المعادلات</li>
+            <li><i class="fa-solid fa-table-cells"></i> الأنظمة الخطية</li>
+            <li><i class="fa-solid fa-chart-area"></i> التكامل</li>
         </ul>
     </nav>
 
-    <div class="main-wrapper">
-        <div class="info-banner" id="methodInfo">
-             اختر طريقة الحل للبدء. البرنامج سيقوم بحساب الجذر التقريبي للدالة f(x)=0.
-        </div>
-
-        <div class="content-area">
-            <div class="control-panel">
-                <h3>🔢 المدخلات</h3>
-                
-                <div class="input-group">
-                    <label>الدالة f(x):</label>
-                    <div class="input-with-hint">
-                        <input type="text" id="equation" placeholder="مثال: x^3 - x - 1" value="x^3 - x - 1">
-                    </div>
+    <main class="main-container">
+        
+        <section class="glass-card control-panel">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-sliders"></i> إعدادات الحل</h2>
+            </div>
+            
+            <div class="input-group">
+                <label>الدالة الرياضية $f(x)$</label>
+                <div class="input-wrapper">
+                    <input type="text" id="equation" value="x^3 - x - 1" oninput="renderMath()">
+                    <i class="fa-solid fa-function"></i>
                 </div>
+                <div id="mathPreview" class="math-preview">$$x^3 - x - 1$$</div>
+            </div>
 
-                <div class="input-group">
-                    <label>الطريقة:</label>
-                    <select id="methodSelect" onchange="updateMethodInfo()">
-                        <option value="bisection">طريقة التنصيف (Dichotomie)</option>
+            <div class="input-group">
+                <label>طريقة الحل</label>
+                <div class="select-wrapper">
+                    <select id="methodSelect" onchange="toggleInputs()">
+                        <option value="bisection">طريقة التنصيف (Bisection)</option>
                         <option value="newton">طريقة نيوتن (Newton)</option>
                     </select>
                 </div>
+            </div>
 
-                <div id="bisectionInputs" class="method-inputs">
-                    <label>المجال [a, b]:</label>
-                    <div class="row">
-                        <input type="number" id="a" placeholder="a" value="1">
-                        <input type="number" id="b" placeholder="b" value="2">
-                    </div>
-                </div>
-
-                <div id="newtonInputs" class="method-inputs" style="display: none;">
-                    <label>نقطة البداية x0:</label>
-                    <input type="number" id="x0" placeholder="x0" value="1.5">
-                </div>
-
+            <div id="bisectionInputs" class="method-section">
+                <label>المجال $[a, b]$</label>
                 <div class="row">
-                    <div class="half">
-                        <label>الدقة (ε):</label>
-                        <input type="number" id="tolerance" value="0.0001" step="0.00001">
-                    </div>
-                    <div class="half">
-                        <label>Max Iterations:</label>
-                        <input type="number" id="maxIter" value="50">
-                    </div>
+                    <input type="number" id="a" placeholder="a" value="1">
+                    <input type="number" id="b" placeholder="b" value="2">
                 </div>
-
-                <button onclick="solveEquation()">احسب الحل</button>
-                <div id="finalResult" class="result-box hidden"></div>
             </div>
 
-            <div class="visual-panel">
+            <div id="newtonInputs" class="method-section hidden">
+                <label>نقطة الانطلاق $x_0$</label>
+                <input type="number" id="x0" placeholder="x0" value="1.5">
+            </div>
+
+            <div class="row advanced-settings">
+                <div class="col">
+                    <label>الدقة $\epsilon$</label>
+                    <input type="number" id="tolerance" value="0.0001" step="0.00001">
+                </div>
+                <div class="col">
+                    <label>Max Iter</label>
+                    <input type="number" id="maxIter" value="50">
+                </div>
+            </div>
+
+            <button onclick="solve()" class="btn-primary">
+                <span>احسب الحل</span> <i class="fa-solid fa-rocket"></i>
+            </button>
+
+            <div id="resultBox" class="result-card hidden">
+                <div class="result-icon"><i class="fa-solid fa-check"></i></div>
+                <div class="result-text">
+                    <span>الجذر التقريبي:</span>
+                    <strong id="rootValue"></strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="visualization-panel">
+            
+            <div class="glass-card chart-container">
                 <div id="plotArea"></div>
-                
-                <div id="tableContainer" class="hidden">
-                    <div class="table-header">
-                        <h3>📋 جدول التكرارات</h3>
-                        <button class="small-btn" onclick="exportToCSV()">تنزيل النتائج (Excel)</button>
-                    </div>
-                    <div class="table-responsive">
-                        <table id="stepsTable">
-                            <thead></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+            </div>
+
+            <div class="glass-card table-container hidden" id="tableCard">
+                <div class="card-header row-between">
+                    <h3><i class="fa-solid fa-list-ol"></i> خطوات الحل</h3>
+                    <button onclick="exportCSV()" class="btn-small"><i class="fa-solid fa-download"></i> Excel</button>
+                </div>
+                <div class="table-scroll">
+                    <table id="resultsTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+
+    </main>
 
     <script src="script.js"></script>
 </body>
