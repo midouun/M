@@ -1,182 +1,87 @@
 :root {
-    --primary-color: #6366f1;
-    --secondary-color: #a855f7;
-    --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --text-color: #f8fafc;
-    --text-muted: #94a3b8;
-    --success: #10b981;
+    --bg-dark: #0f172a;
+    --glass: rgba(30, 41, 59, 0.7);
+    --border: rgba(255, 255, 255, 0.1);
+    --accent-bi: #3b82f6; /* أزرق للتنصيف */
+    --accent-new: #10b981; /* أخضر لنيوتن */
+    --text: #f1f5f9;
 }
 
 body {
+    background-color: var(--bg-dark);
+    color: var(--text);
     font-family: 'Cairo', sans-serif;
-    background: var(--bg-gradient);
-    color: var(--text-color);
     margin: 0;
-    min-height: 100vh;
-    overflow-x: hidden;
 }
 
-/* خلفية متحركة */
-.background-shapes .shape {
-    position: absolute;
-    filter: blur(80px);
-    z-index: -1;
-    animation: float 10s infinite alternate;
-}
-.shape-1 { width: 300px; height: 300px; background: #4f46e5; top: 10%; left: 10%; border-radius: 50%; }
-.shape-2 { width: 400px; height: 400px; background: #db2777; bottom: 10%; right: 5%; border-radius: 50%; animation-delay: 2s; }
-
-@keyframes float {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(30px, 50px); }
-}
-
-/* النافبار */
 .glass-nav {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--glass);
+    padding: 15px 30px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.brand { font-size: 1.4rem; font-weight: bold; }
+.brand span { color: var(--accent-new); }
+
+.container { display: flex; gap: 20px; padding: 20px; max-width: 1400px; margin: 0 auto; }
+.sidebar { flex: 1; min-width: 300px; }
+.content { flex: 3; display: flex; flex-direction: column; gap: 20px; }
+
+.glass-panel {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
     backdrop-filter: blur(10px);
-    padding: 1rem 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--glass-border);
 }
-
-.logo { font-size: 1.5rem; font-weight: 700; color: white; }
-.logo span { color: var(--secondary-color); }
-
-.nav-links { list-style: none; display: flex; gap: 20px; }
-.nav-links li { cursor: pointer; padding: 8px 15px; border-radius: 20px; transition: 0.3s; font-size: 0.9rem; }
-.nav-links li.active, .nav-links li:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
-
-/* الحاويات */
-.main-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    padding: 30px 5%;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
-
-.control-panel { flex: 1; min-width: 320px; height: fit-content; }
-.visualization-panel { flex: 2; min-width: 400px; display: flex; flex-direction: column; gap: 25px; }
 
 /* المدخلات */
-.input-group { margin-bottom: 20px; }
-label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
-
-.input-wrapper, .select-wrapper { position: relative; }
-input, select {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    color: white;
-    padding: 12px 15px;
-    border-radius: 10px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    transition: 0.3s;
-    font-family: 'Cairo', sans-serif;
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; color: #94a3b8; }
+input { 
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    color: white; padding: 10px; border-radius: 8px; box-sizing: border-box;
 }
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background: rgba(0, 0, 0, 0.4);
-}
-
-/* Math Preview */
-.math-preview {
-    margin-top: 10px;
-    padding: 10px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    text-align: center;
-    color: #fbbf24;
-    font-size: 1.1rem;
-}
-
-/* الأزرار */
-.btn-primary {
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    border: none;
-    padding: 15px;
-    width: 100%;
-    color: white;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    font-family: 'Cairo', sans-serif;
-}
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-}
-
-.btn-small {
-    background: var(--success);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Cairo', sans-serif;
-}
-
-/* النتائج */
-.result-card {
-    margin-top: 20px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid var(--success);
-    border-radius: 12px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    animation: fadeIn 0.5s ease-out;
-}
-.result-icon {
-    background: var(--success);
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-}
-
-/* الجدول */
-.table-scroll { overflow-x: auto; max-height: 400px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-th, td { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-th { background: rgba(0,0,0,0.2); color: var(--secondary-color); position: sticky; top: 0; }
-tr:hover { background: rgba(255,255,255,0.05); }
-
-/* أدوات مساعدة */
-.hidden { display: none; }
+.latex-view { background: rgba(0,0,0,0.2); padding: 10px; text-align: center; border-radius: 8px; margin-top: 5px; color: #fbbf24; }
 .row { display: flex; gap: 10px; }
-.col { flex: 1; }
-.row-between { display: flex; justify-content: space-between; align-items: center; }
 
-/* تخصيص Plotly ليتناسب مع الوضع المظلم */
-.js-plotly-plot .plotly .main-svg { background: transparent !important; }
+.btn-run {
+    width: 100%; background: linear-gradient(45deg, var(--accent-bi), var(--accent-new));
+    color: white; border: none; padding: 12px; border-radius: 8px;
+    font-size: 1.1rem; cursor: pointer; margin-top: 10px; font-family: 'Cairo';
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* بطاقات النتائج */
+.cards-wrapper { display: flex; gap: 20px; }
+.stat-card { flex: 1; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.05); }
+.stat-card.bisection { border-right: 4px solid var(--accent-bi); }
+.stat-card.newton { border-right: 4px solid var(--accent-new); }
+.val { font-size: 1.5rem; font-weight: bold; margin: 10px 0; direction: ltr; }
 
-/* التجاوب مع الموبايل */
-@media (max-width: 768px) {
-    .glass-nav { flex-direction: column; gap: 10px; }
-    .main-container { padding: 15px; }
+/* الجداول */
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th { background: rgba(255,255,255,0.05); padding: 10px; }
+td { padding: 8px; border-bottom: 1px solid var(--border); text-align: center; direction: ltr; }
+
+/* التحكم في التبويبات */
+.tabs { margin-bottom: 15px; border-bottom: 1px solid var(--border); }
+.tab-btn { background: none; border: none; color: #94a3b8; padding: 10px 20px; cursor: pointer; font-family: 'Cairo'; font-size: 1rem; }
+.tab-btn.active { color: white; border-bottom: 2px solid var(--accent-new); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+@keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+/* وضع الطباعة (مهم جداً للمشاريع) */
+@media print {
+    body { background: white; color: black; }
+    .no-print, .glass-nav, .btn-run, .tabs { display: none; }
+    .glass-panel { border: 1px solid #ccc; background: none; box-shadow: none; color: black; break-inside: avoid; }
+    input { border: 1px solid #000; color: black; }
+    .latex-view { color: black; border: 1px solid #ccc; }
+    .val, table { color: black; }
+    th { background: #eee; color: black; }
+    td { border-bottom: 1px solid #000; }
+    .tab-content { display: block !important; margin-top: 20px; } /* طباعة الجدولين معاً */
+    #convergencePlot { border: 1px solid #ccc; }
 }
