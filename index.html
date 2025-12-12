@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحلل العددي المتقدم - الوحدة 1</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="control-panel">
+            <h1>🛠️ إعدادات الحل</h1>
+            
+            <div class="input-group">
+                <label>الدالة f(x):</label>
+                <div class="input-with-hint">
+                    <input type="text" id="equation" placeholder="مثال: x^3 - x - 1" value="x^3 - x - 1">
+                    <select id="examples" onchange="loadExample()">
+                        <option value="">-- أمثلة جاهزة --</option>
+                        <option value="x^2 - 2">x^2 - 2 (جذر 2)</option>
+                        <option value="cos(x) - x">cos(x) - x</option>
+                        <option value="x^3 - x - 1">x^3 - x - 1</option>
+                        <option value="e^x - 3*x">e^x - 3x</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>طريقة الحل:</label>
+                <select id="methodSelect" onchange="toggleInputs()">
+                    <option value="bisection">طريقة التنصيف (Dichotomy)</option>
+                    <option value="newton">طريقة نيوتن (Newton)</option>
+                </select>
+            </div>
+
+            <div id="bisectionInputs" class="method-inputs">
+                <label>المجال [a, b]:</label>
+                <div class="row">
+                    <input type="number" id="a" placeholder="a" value="1">
+                    <input type="number" id="b" placeholder="b" value="2">
+                </div>
+            </div>
+
+            <div id="newtonInputs" class="method-inputs" style="display: none;">
+                <label>نقطة البداية x0:</label>
+                <input type="number" id="x0" placeholder="x0" value="1.5">
+            </div>
+
+            <div class="row">
+                <div class="half">
+                    <label>الدقة (Tolerance):</label>
+                    <input type="number" id="tolerance" value="0.0001" step="0.00001">
+                </div>
+                <div class="half">
+                    <label>التكرارات (Max Iter):</label>
+                    <input type="number" id="maxIter" value="50">
+                </div>
+            </div>
+
+            <button onclick="solveEquation()">🚀 احسب الحل وارسم الدالة</button>
+            
+            <div id="finalResult" class="result-box hidden"></div>
+        </div>
+
+        <div class="visual-panel">
+            <div id="plotArea"></div>
+            
+            <div id="tableContainer" class="hidden">
+                <h3>📋 تفاصيل الخطوات (Iterations)</h3>
+                <div class="table-responsive">
+                    <table id="stepsTable">
+                        <thead>
+                            </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
