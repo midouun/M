@@ -3,146 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NumSolver | منصة التحليل العددي</title>
+    <title>مشروع التحليل العددي | قربوس لخضر</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="style.css">
-
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
-    <script>
-        window.MathJax = { tex: { inlineMath: [['$', '$']] }, svg: { fontCache: 'global' } };
-    </script>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] }, svg: { fontCache: 'global' } };</script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
-    <div class="bg-animation">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
-
-    <section id="landing-page" class="landing-container">
-        <nav class="glass-nav">
-            <div class="logo"><i class="fa-solid fa-infinity"></i> NumSolver</div>
-            <div class="nav-items">
-                <span>مشروع التحليل العددي</span>
-                <span class="badge">2026</span>
-            </div>
-        </nav>
-
-        <div class="hero-content">
-            <h1>حل المعادلات غير الخطية <br> <span class="gradient-text">بذكاء ودقة</span></h1>
-            <p class="description">
-                تطبيق تفاعلي يهدف لتبسيط المفاهيم الرياضية المعقدة. 
-                نقوم بحساب الجذور التقريبية للدوال $f(x)=0$ باستخدام خوارزميات 
-                <strong>نيوتن (Newton)</strong> و <strong>التنصيف (Bisection)</strong> 
-                مع تمثيل بياني حي ومباشر.
-            </p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
-                    <h3>رسم بياني تفاعلي</h3>
-                    <p>شاهد سلوك الدالة واقتراب الحل بصرياً.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon-box"><i class="fa-solid fa-table-list"></i></div>
-                    <h3>جداول مفصلة</h3>
-                    <p>تتبع كل خطوة وتكرار مع حساب نسبة الخطأ.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon-box"><i class="fa-solid fa-bolt"></i></div>
-                    <h3>سرعة ودقة</h3>
-                    <p>خوارزميات محسنة لتعطيك النتيجة في أجزاء من الثانية.</p>
-                </div>
-            </div>
-
-            <button class="cta-button" onclick="goToApp()">
-                ابدأ التجربة الآن <i class="fa-solid fa-arrow-left"></i>
-            </button>
+    <header class="official-header">
+        <div class="top-titles">
+            <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+            <h4>وزارة التعليم العالي والبحث العلمي</h4>
+            <h2>المدرسة العليا للأساتذة "عبد الرحمان طالب" - الأغواط</h2>
         </div>
         
-        <footer class="landing-footer">
-            إعداد وتطوير: [اسمك هنا] | المدرسة العليا للأساتذة
-        </footer>
-    </section>
+        <div class="project-meta">
+            <div class="meta-box supervisor">
+                <span class="label">تحت إشراف الأستاذ:</span>
+                <span class="value">الأستاذ المشرف</span>
+            </div>
+            <div class="meta-box title-box">
+                <h1>تطوير تطبيق في التحليل العددي</h1>
+                <span class="subtitle">حل المعادلات غير الخطية $f(x)=0$</span>
+            </div>
+            <div class="meta-box student">
+                <span class="label">من إعداد الطالب:</span>
+                <span class="value">قربوس لخضر</span>
+            </div>
+        </div>
+    </header>
 
-    <section id="app-interface" class="app-container hidden">
+    <div class="main-layout">
         
-        <header class="app-header">
-            <button class="back-btn" onclick="goHome()">
-                <i class="fa-solid fa-house"></i> الرئيسية
-            </button>
-            <h2>مختبر الحلول</h2>
-            <button class="print-btn" onclick="window.print()">
-                <i class="fa-solid fa-print"></i> تقرير
-            </button>
-        </header>
-
-        <div class="workspace">
-            <div class="glass-panel control-panel">
-                <div class="panel-head">
-                    <h3><i class="fa-solid fa-sliders"></i> المدخلات</h3>
+        <aside class="sidebar no-print">
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-flask"></i> مدخلات الحل</h3>
+                
+                <div class="input-group">
+                    <label>الدالة الرياضية $f(x)$</label>
+                    <input type="text" id="eq" value="x^3 - x - 1" oninput="updateMath()" placeholder="مثال: x^2 - 4">
+                    <div id="latex-view" class="latex-box">$$x^3 - x - 1$$</div>
                 </div>
 
                 <div class="input-group">
-                    <label>الدالة $f(x)$</label>
-                    <input type="text" id="equation" value="x^3 - x - 1" placeholder="مثال: cos(x) - x">
+                    <label>طريقة الحل</label>
+                    <div class="toggle-switch">
+                        <button class="t-btn active" onclick="setMode('newton', this)">نيوتن (Newton)</button>
+                        <button class="t-btn" onclick="setMode('bisection', this)">التنصيف (Bisection)</button>
+                    </div>
                 </div>
 
-                <div class="method-selector">
-                    <button class="m-btn active" onclick="setMethod('bisection', this)">التنصيف</button>
-                    <button class="m-btn" onclick="setMethod('newton', this)">نيوتن</button>
+                <div id="params-newton" class="params-box">
+                    <label>نقطة البداية $x_0$</label>
+                    <input type="number" id="x0" value="1.5" step="0.1">
                 </div>
-                <input type="hidden" id="selectedMethod" value="bisection">
 
-                <div id="bisection-inputs" class="dynamic-inputs">
+                <div id="params-bisection" class="params-box hidden">
                     <div class="row">
-                        <input type="number" id="a" placeholder="المجال a" value="1">
-                        <input type="number" id="b" placeholder="المجال b" value="2">
+                        <div><label>المجال [a]</label><input type="number" id="a" value="1"></div>
+                        <div><label>المجال [b]</label><input type="number" id="b" value="2"></div>
                     </div>
                 </div>
 
-                <div id="newton-inputs" class="dynamic-inputs hidden">
-                    <input type="number" id="x0" placeholder="نقطة البداية x0" value="1.5">
+                <div class="row small-inputs">
+                    <div><label>الدقة ($\epsilon$)</label><input type="number" id="tol" value="0.0001" step="0.00001"></div>
+                    <div><label>Max Iter</label><input type="number" id="max" value="50"></div>
                 </div>
 
-                <div class="row settings">
-                    <input type="number" id="tolerance" placeholder="الدقة" value="0.0001">
-                    <input type="number" id="maxIter" placeholder="Tours" value="50">
-                </div>
-
-                <button class="run-btn" onclick="solve()">
-                    احسب النتيجة <i class="fa-solid fa-rocket"></i>
+                <button class="btn-main" onclick="startSimulation()">
+                    <i class="fa-solid fa-play"></i> حساب ومحاكاة
                 </button>
-                
-                <div id="quick-result" class="result-badge hidden">
-                    النتيجة: <span id="res-val"></span>
-                </div>
             </div>
 
-            <div class="glass-panel visual-panel">
-                <div id="plotArea" class="plot-box"></div>
-                
-                <div id="tableContainer" class="table-box hidden">
-                    <div class="table-head">
-                        <h4>سجل الخطوات</h4>
-                        <button onclick="exportCSV()" class="small-btn">Excel</button>
+            <div id="sim-controls" class="glass-card hidden sim-panel">
+                <h4><i class="fa-solid fa-video"></i> تتبع الخطوات</h4>
+                <div class="sim-buttons">
+                    <button onclick="step(-1)"><i class="fa-solid fa-backward"></i></button>
+                    <span id="step-counter">0 / 0</span>
+                    <button onclick="step(1)"><i class="fa-solid fa-forward"></i></button>
+                </div>
+                <div id="step-desc" class="step-info">اضغط التالي للبدء...</div>
+            </div>
+            
+            <button onclick="window.print()" class="btn-print"><i class="fa-solid fa-print"></i> طباعة التقرير</button>
+        </aside>
+
+        <main class="content">
+            <div class="glass-card chart-wrapper">
+                <div id="plot"></div>
+                <div class="hint-text no-print"><i class="fa-solid fa-mouse-pointer"></i> يمكنك النقر على الرسم لتغيير $x_0$</div>
+            </div>
+
+            <div class="glass-card results-wrapper hidden" id="res-card">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span>الجذر التقريبي</span>
+                        <strong id="final-root" style="color: #10b981">-</strong>
                     </div>
-                    <div class="table-wrap">
-                        <table id="resultsTable">
-                            <thead></thead>
-                            <tbody></tbody>
-                        </table>
+                    <div class="stat-item">
+                        <span>عدد التكرارات</span>
+                        <strong id="final-iter">-</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>قيمة $f(root)$</span>
+                        <strong id="final-func" dir="ltr">-</strong>
+                    </div>
+                </div>
+                
+                <div class="table-section">
+                    <h4>جدول القيم المفصل:</h4>
+                    <div class="table-scroll">
+                        <table id="res-table"><thead></thead><tbody></tbody></table>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
